@@ -22,7 +22,30 @@ def conv_forward(x, w, b, conv_param):
     ##############################################################################
     #                          IMPLEMENT YOUR CODE                               #
     ##############################################################################
-    pass
+    N,H,W,C =x.shape #batch-size (number of images - one times), Height, Width, Channel
+    F,WH,WW,C = w.shape #Number of Filters, Filter Height, Filter Width, Channel
+
+    F, = b.shape
+    S = conv_param['stride']
+    if (conv_param['padding'] =='valid'):
+        P = np.zeros(0)
+    if (conv_param['padding'] =='same'):
+        P = 1
+    #a output data has size H_out, W_out
+    print (W,WH,P,S)
+    H_out = (H-WH+2*P)/S +1
+    W_out = (W-WW+2*P)/S +1
+    #
+    out =np.zeros((N,F,H_out,W_out))
+    npad = ((P,P),(P,P))
+    x_pad = np.pad(x, ((0, 0), (0, 0), (P, P), (P, P)), mode='constant')
+    for i in range(N):
+        image = x_pad[ i , : , : , : ]
+        for j in range(F):
+            for k in range(H_out):
+                for l in range(W_out):
+                    image_temp = image[:, (k*S):(k*S + WH), (l*S):(l*S + WW)]
+                    out[i, j, k, l] = np.sum(np.multiply(image_patch, w[j, :, :, :])) + b[j] 
     ##############################################################################
     #                             END OF YOUR CODE                               #
     ##############################################################################
