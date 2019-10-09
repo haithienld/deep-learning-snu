@@ -35,12 +35,11 @@ def conv_forward(x, w, b, conv_param):
     if (conv_param['padding'] =='same'):
         Ph = int((WH - 1)/2)
         Pw = int((WW -1)/2)
-        H_out = math.ceil(H-WH+2*Ph/SH)
-        W_out = math.ceil(W-WW+2*Pw/SW)
+        H_out = int((H-WH+2*Ph)/SH) +1
+        W_out = int((W-WW+2*Pw)/SW) +1
         # H_out = math.ceil(H/SH)
         # W_out = math.ceil(W/SW)
     #a output data has size H_out, W_out
-    print(F,WW,WH,Pw,Ph,SH,SW)
     
     # H_out = int((H-WH+2*Ph)/SH) +1
     # W_out = int((W-WW+2*Pw)/SW) +1
@@ -57,16 +56,16 @@ def conv_forward(x, w, b, conv_param):
     # Shape N,F
     for i in range(N):
         image = x_pad[ i , : , : , : ]
-        for j in range(F):
-            for k in range(H_out): 
-                for l in range(W_out):
-                    h1 = k*SH
-                    h2 = (k*SH + WH)
-                    w1 = l*SW
-                    w2 = (l*SW + WW)
+        for j in range(H_out): 
+            for k in range(W_out):
+                for l in range(F):
+                    h1 = j*SH
+                    h2 = j*SH + WH
+                    w1 = k*SW
+                    w2 = k*SW + WW
                     print (h1,h2,w1,w2)
                     image_temp = image[h1:h2, w1:w2,:]
-                    out[i, j, k, l] = np.sum(np.multiply(image_temp, w[j, :, :, :])) + b[j] 
+                    out[i,j,k,l] = np.sum(np.multiply(image_temp, w[l, :, :, :])) + b[l] 
     ##############################################################################
     #                             END OF YOUR CODE                               #
     ##############################################################################
@@ -166,7 +165,7 @@ def Test_conv_forward(num):
                                  [[ -2.29811741e-01,   5.68244402e-01],
                                   [ -2.82506405e-01,   6.88792470e-01]]],
                                 [[[ -5.10849950e-01,   1.21116743e+00],
-                                  [ -5.63544614e-01,   1.33171550e+00]],
+                                   [ -5.63544614e-01,   1.33171550e+00]],
                                  [[ -7.91888159e-01,   1.85409045e+00],
                                   [ -8.44582823e-01,   1.97463852e+00]]]])
     else:
