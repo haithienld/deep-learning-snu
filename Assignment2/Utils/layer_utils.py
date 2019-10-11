@@ -1,5 +1,6 @@
 import numpy as np
 from Utils.data_utils import plot_conv_images
+import math 
 
 def conv_forward(x, w, b, conv_param):
     """
@@ -24,28 +25,55 @@ def conv_forward(x, w, b, conv_param):
     ##############################################################################
     N,H,W,C =x.shape #batch-size (number of images - one times), Height, Width, Channel
     F,WH,WW,C = w.shape #Number of Filters, Filter Height, Filter Width, Channel
-
-    F, = b.shape
     S = conv_param['stride']
+    SH = S[1]
+    SW = S[2]
     if (conv_param['padding'] =='valid'):
-        P = np.zeros(0)
+        Ph = Pw = 0
+        H_out = int((H-WH)/SH) +1
+        W_out = int((W-WW)/SW) +1
     if (conv_param['padding'] =='same'):
-        P = 1
+        Ph = int((WH - 1)/2)
+        Pw = int((WW -1)/2)
+        H_out = int((H-WH+2*Ph)/SH) +1
+        W_out = int((W-WW+2*Pw)/SW) +1
+        # H_out = math.ceil(H/SH)
+        # W_out = math.ceil(W/SW)
     #a output data has size H_out, W_out
-    print (W,WH,P,S)
-    H_out = (H-WH+2*P)/S +1
-    W_out = (W-WW+2*P)/S +1
-    #
-    out =np.zeros((N,F,H_out,W_out))
-    npad = ((P,P),(P,P))
-    x_pad = np.pad(x, ((0, 0), (0, 0), (P, P), (P, P)), mode='constant')
+    
+    # H_out = int((H-WH+2*Ph)/SH) +1
+    # W_out = int((W-WW+2*Pw)/SW) +1
+
+    out = np.zeros((N, H_out, W_out, F))
+
+    # for i in range(C):
+    #     for j in range (H + 2 * Ph):
+    #         for k in range (W + 2 * Pw):
+    #             a = 3
+
+    x_pad = np.pad(x, ((0,), (Ph,), (Pw,), (0,)), mode='constant')
+    #print(x_pad)
+    # Shape N,F
     for i in range(N):
         image = x_pad[ i , : , : , : ]
+<<<<<<< HEAD
         for j in range(F):
             for k in range(H_out):
                 for l in range(W_out):
                     image_temp = image[:, (k*S):(k*S + WH), (l*S):(l*S + WW)]
                     out[i, j, k, l] = np.sum(np.multiply(image_temp, w[j, :, :, :])) + b[j] 
+=======
+        for j in range(H_out): 
+            for k in range(W_out):
+                for l in range(F):
+                    h1 = j*SH
+                    h2 = j*SH + WH
+                    w1 = k*SW
+                    w2 = k*SW + WW
+                    print (h1,h2,w1,w2)
+                    image_temp = image[h1:h2, w1:w2,:]
+                    out[i,j,k,l] = np.sum(np.multiply(image_temp, w[l, :, :, :])) + b[l] 
+>>>>>>> 14f5e486a3b49b21086614d5153d624fb20dfc7b
     ##############################################################################
     #                             END OF YOUR CODE                               #
     ##############################################################################
@@ -76,6 +104,7 @@ def conv_backward(dout, cache):
     return dx, dw, db
 
 def max_pool_forward(x, pool_param):
+    #https://datascience-enthusiast.com/DL/Convolution_model_Step_by_Stepv2.html
     """
     Computes the forward pass for a pooling layer.
     
@@ -144,7 +173,7 @@ def Test_conv_forward(num):
                                  [[ -2.29811741e-01,   5.68244402e-01],
                                   [ -2.82506405e-01,   6.88792470e-01]]],
                                 [[[ -5.10849950e-01,   1.21116743e+00],
-                                  [ -5.63544614e-01,   1.33171550e+00]],
+                                   [ -5.63544614e-01,   1.33171550e+00]],
                                  [[ -7.91888159e-01,   1.85409045e+00],
                                   [ -8.44582823e-01,   1.97463852e+00]]]])
     else:
