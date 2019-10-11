@@ -56,13 +56,6 @@ def conv_forward(x, w, b, conv_param):
     # Shape N,F
     for i in range(N):
         image = x_pad[ i , : , : , : ]
-<<<<<<< HEAD
-        for j in range(F):
-            for k in range(H_out):
-                for l in range(W_out):
-                    image_temp = image[:, (k*S):(k*S + WH), (l*S):(l*S + WW)]
-                    out[i, j, k, l] = np.sum(np.multiply(image_temp, w[j, :, :, :])) + b[j] 
-=======
         for j in range(H_out): 
             for k in range(W_out):
                 for l in range(F):
@@ -73,7 +66,6 @@ def conv_forward(x, w, b, conv_param):
                     print (h1,h2,w1,w2)
                     image_temp = image[h1:h2, w1:w2,:]
                     out[i,j,k,l] = np.sum(np.multiply(image_temp, w[l, :, :, :])) + b[l] 
->>>>>>> 14f5e486a3b49b21086614d5153d624fb20dfc7b
     ##############################################################################
     #                             END OF YOUR CODE                               #
     ##############################################################################
