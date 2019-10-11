@@ -28,44 +28,47 @@ def conv_forward(x, w, b, conv_param):
     S = conv_param['stride']
     SH = S[1]
     SW = S[2]
+
     if (conv_param['padding'] =='valid'):
         Ph = Pw = 0
         H_out = int((H-WH)/SH) +1
         W_out = int((W-WW)/SW) +1
+        x_pad = np.pad(x, ((0,), (Ph,), (Pw,), (0,)), mode='constant')
+        #print(x_pad)
+        # Shape N,F
+        out = np.zeros((N, H_out, W_out, F))
+        for i in range(N):
+            image = x_pad[ i , : , : , : ]
+            for j in range(H_out): 
+                for k in range(W_out):
+                    for l in range(F):
+                        h1 = j*SH
+                        h2 = j*SH + WH
+                        w1 = k*SW
+                        w2 = k*SW + WW
+                        print (h1,h2,w1,w2)
+                        image_temp = image[h1:h2, w1:w2,:]
+                        out[i,j,k,l] = np.sum(np.multiply(image_temp, w[l, :, :, :])) + b[l] 
     if (conv_param['padding'] =='same'):
         Ph = int((WH - 1)/2)
         Pw = int((WW -1)/2)
         H_out = int((H-WH+2*Ph)/SH) +1
         W_out = int((W-WW+2*Pw)/SW) +1
-        # H_out = math.ceil(H/SH)
-        # W_out = math.ceil(W/SW)
+        H_out = math.ceil(H/SH)
+        W_out = math.ceil(W/SW)
     #a output data has size H_out, W_out
     
     # H_out = int((H-WH+2*Ph)/SH) +1
     # W_out = int((W-WW+2*Pw)/SW) +1
 
-    out = np.zeros((N, H_out, W_out, F))
+    
 
     # for i in range(C):
     #     for j in range (H + 2 * Ph):
     #         for k in range (W + 2 * Pw):
     #             a = 3
 
-    x_pad = np.pad(x, ((0,), (Ph,), (Pw,), (0,)), mode='constant')
-    #print(x_pad)
-    # Shape N,F
-    for i in range(N):
-        image = x_pad[ i , : , : , : ]
-        for j in range(H_out): 
-            for k in range(W_out):
-                for l in range(F):
-                    h1 = j*SH
-                    h2 = j*SH + WH
-                    w1 = k*SW
-                    w2 = k*SW + WW
-                    print (h1,h2,w1,w2)
-                    image_temp = image[h1:h2, w1:w2,:]
-                    out[i,j,k,l] = np.sum(np.multiply(image_temp, w[l, :, :, :])) + b[l] 
+    
     ##############################################################################
     #                             END OF YOUR CODE                               #
     ##############################################################################
