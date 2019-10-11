@@ -45,7 +45,7 @@ def conv_forward(x, w, b, conv_param):
             for k in range(H_out):
                 for l in range(W_out):
                     image_temp = image[:, (k*S):(k*S + WH), (l*S):(l*S + WW)]
-                    out[i, j, k, l] = np.sum(np.multiply(image_patch, w[j, :, :, :])) + b[j] 
+                    out[i, j, k, l] = np.sum(np.multiply(image_temp, w[j, :, :, :])) + b[j] 
     ##############################################################################
     #                             END OF YOUR CODE                               #
     ##############################################################################
