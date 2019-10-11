@@ -35,51 +35,40 @@ def conv_forward(x, w, b, conv_param):
         Ph = Pw = 0
         H_out = int((H-WH)/SH) +1
         W_out = int((W-WW)/SW) +1
+        np_zero = np.zeros(n)
         x_pad = np.pad(x, ((0,), (Ph,), (Pw,), (0,)), mode='constant')
-        #print(x_pad)
-        # Shape N,F
-        out = np.zeros((N, H_out, W_out, F))
-        for i in range(N):
-            image = x_pad[ i , : , : , : ]
-            for j in range(H_out): 
-                for k in range(W_out):
-                    for l in range(F):
-                        h1 = j*SH
-                        h2 = j*SH + WH
-                        w1 = k*SW
-                        w2 = k*SW + WW
-                        image_temp = image[h1:h2, w1:w2,:]
-                        out[i,j,k,l] = np.sum(np.multiply(image_temp, w[l, :, :, :])) + b[l] 
     if (conv_param['padding'] =='same'):
-
         # H_out = int((H-WH+2*Ph)/SH) +1
         # W_out = int((W-WW+2*Pw)/SW) +1
         H_out = math.ceil(H/SH)
         W_out = math.ceil(W/SW)
         print("Height output, Width output of Padding = Same", H_out,W_out)
-        Ph = int(0)
-        Pw = int(0)
-        x_pad = np.pad(x, ((0,), (Ph,), (Pw,), (0,)), mode='constant')
-        print(Ph,Pw,H_out,W_out)
-        out = np.zeros((N, H_out, W_out, F))
-        for i in range(N):
-            image = x_pad[ i , : , : , : ]
-            for j in range(H_out): 
-                for k in range(W_out):
-                    for l in range(F):
-                        h1 = j*SH
-                        h2 = j*SH + WH
-                        w1 = k*SW
-                        w2 = k*SW + WW
-                        print(h1,h2,w1,w2)
-                        image_temp = image[h1:h2, w1:w2,:]
-                        out[i,j,k,l] = np.sum(np.multiply(image_temp, w[l, :, :, :])) + b[l] 
+        Ph = int((H_out-1)*SH + WH - H)
+        Pht = int(Ph/2)
+        Phb = Ph - Pht
+        Pw = int((W_out-1)*SW + WW - W)
+        Pwl = int(Pw/2)
+        Pwr = Pw - Pwl
+        x_pad = np.pad(x, ((0,), (Pht,Phb), (Pwr,Pwl), (0,)), mode='constant')
+    
+        #print(x_pad)
+        # Shape N,F
+    out = np.zeros((N, H_out, W_out, F))
+    for i in range(N):
+        image = x_pad[ i, :, : , : ]
+        for j in range(H_out): 
+            for k in range(W_out):
+                for l in range(F):
+                    h1 = j*SH
+                    h2 = j*SH + WH
+                    w1 = k*SW
+                    w2 = k*SW + WW
+                    image_temp = image[h1:h2, w1:w2,:]
+                    out[i,j,k,l] = np.sum(np.multiply(image_temp, w[l, :, :, :])) + b[l] 
     #a output data has size H_out, W_out
     
     # H_out = int((H-WH+2*Ph)/SH) +1
     # W_out = int((W-WW+2*Pw)/SW) +1
-
-    
 
     # for i in range(C):
     #     for j in range (H + 2 * Ph):
@@ -137,7 +126,7 @@ def max_pool_forward(x, pool_param):
     ##############################################################################
     #                          IMPLEMENT YOUR CODE                               #
     ##############################################################################
-    pass
+    N,H,W,C = x.shape
     ##############################################################################
     #                             END OF YOUR CODE                               #
     ##############################################################################
