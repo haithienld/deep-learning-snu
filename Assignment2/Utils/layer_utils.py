@@ -65,7 +65,7 @@ def conv_forward(x, w, b, conv_param):
                     w1 = k*SW
                     w2 = k*SW + WW
                     image_temp = image[h1:h2, w1:w2,:]
-                    out[i,j,k,l] = np.sum(np.multiply(image_temp, w[l, :, :, :])) + b[l] 
+                    out[i,j,k,l] = np.sum(np.multiply(image_temp, w[l, :, :, :])) + b[l]
     #a output data has size H_out, W_out
     # H_out = int((H-WH+2*Ph)/SH) +1
     # W_out = int((W-WW+2*Pw)/SW) +1
@@ -127,7 +127,29 @@ def max_pool_forward(x, pool_param):
     #                          IMPLEMENT YOUR CODE                               #
     ##############################################################################
     N,H,W,C = x.shape
-    
+    pool_H = pool_param['pool_height']
+    pool_W = pool_param['pool_width']
+    S = pool_param['stride']
+    SH = S[1]
+    SW = S[2]
+    #if padding == 'valid'
+    Ph = Pw = 0
+    H_out = int((H - pool_H + 2*Ph)/SH + 1)
+    W_out = int((W - pool_W + 2*Pw)/SW + 1)
+    x_pad = np.zeros((N,H,W,C))
+    x_pad[:,0:H,0:W,:] = x
+    out = np.zeros((N, H_out, W_out, C))
+    for i in range(N):
+        image = x_pad[ i, :, : , : ]
+        for j in range(H_out):
+            for k in range(W_out):
+                for l in range(C):
+                    h1 = j*SH
+                    h2 = j*SH + pool_H
+                    w1 = k*SW
+                    w2 = k*SW + pool_W
+                    image_temp = image[h1:h2, w1:w2,:]
+                    out[i,j,k,l] = np.amax(image_temp)
 
     ##############################################################################
     #                             END OF YOUR CODE                               #
