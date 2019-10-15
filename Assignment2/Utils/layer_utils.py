@@ -126,7 +126,7 @@ def conv_backward(dout, cache):
         for j in range(H_out):
             for k in range(W_out):
                 for l in range(F):
-                    dw[l,:,:,:] += x_pad[l,j*SH:j*SH + WH, k*SW:k*SW+WW,:]*dout[i,j,k,l]
+                    dw[l,:,:,:] += x_pad[i,j*SH:j*SH + WH, k*SW:k*SW+WW,:]*dout[i,j,k,l]
     db = np.zeros(b.shape)
     for f in range(F):
         db[f] += np.sum(dout[:,:,:,f])
@@ -138,7 +138,7 @@ def conv_backward(dout, cache):
                 for l in range(F):
                     for c in range(C):
                         dx_pad[i,j*SH:j*SH + WH, k*SW:k*SW+WW,c] += w[l,:,:,c]*dout[i,j,k,l]
-    dx = dx_pad[:,Pht:H+Pht, Pwl:W+Pwl, :]
+    dx = dx_pad[:,Pht: H+Pht, Pwl:W+Pwl, :]
     ##############################################################################
     #                             END OF YOUR CODE                               #
     ##############################################################################
