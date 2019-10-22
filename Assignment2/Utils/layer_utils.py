@@ -102,17 +102,26 @@ def max_pool_forward(x, pool_param):
     ##############################################################################
     N,H,W,C = x.shape
     pool_H = pool_param['pool_height']
-    pool_W = pool_param['pool_weight']
+    pool_W = pool_param['pool_width']
     S = pool_param['stride']
     SH = S[1]
     SW = S[2]
 
     #with padding = 'valid'
-    OH = (H-pool_H)/SH + 1
-    OW = (W-pool_W)/SW + 1
-
     
-
+    x_pad = np.zeros((N,H,W,C))
+    x_pad[:,0:H,0:W,:] = x
+    
+    OH = int((H-pool_H)/SH) + 1
+    OW = int((W-pool_W)/SW) + 1
+    
+    out = np.zeros((N,OH,OW,C))
+    for i in range(N):
+        for j in range(OH):
+            for k in range(OW):
+                for l in range(C):
+                    #out[i,j,k,l] = np.amax(x_pad[i,SH*j:SH*j+pool_H,SW*k:SW*k*pool_W,l])
+                    out[i,j,k,l] = np.amax(x_pad[i,SH*j:SH*j+pool_H,SW*k:SW*k+pool_W,l])
     ##############################################################################
     #                             END OF YOUR CODE                               #
     ##############################################################################
@@ -136,7 +145,15 @@ def max_pool_backward(dout, cache):
     ##############################################################################
     #                          IMPLEMENT YOUR CODE                               #
     ##############################################################################
-    pass
+    (x,pool_param) = cache
+    N,H,W,C = x.shape
+    pool_H = pool_param['pool_height']
+    pool_W = pool_param['pool_width']
+    S = pool_param['stride']
+
+    OH = (H-pool_H)/SH + 1 
+
+    dx = np.zeros(x.shape)
     ##############################################################################
     #                             END OF YOUR CODE                               #
     ##############################################################################
