@@ -1,4 +1,5 @@
 import numpy as np
+import math
 from Utils.data_utils import plot_conv_images
 
 def conv_forward(x, w, b, conv_param):
@@ -22,7 +23,33 @@ def conv_forward(x, w, b, conv_param):
     ##############################################################################
     #                          IMPLEMENT YOUR CODE                               #
     ##############################################################################
-    pass
+    N,H,W,C = x.shape
+    F,WH,WW,C = w.shape
+    S = conv_param['stride']
+    SH = S[1]
+    SW = S[2]
+    if conv_param['padding'] == 'valid':
+        PH = PW = 0
+        OH = int((H-WH)/SH) + 1
+        OW = int((W-WW)/SW) + 1
+    if conv_param['padding'] == 'same':
+        OH = math.ceil(H/SH)
+        OW = math.ceil(W/SW)
+        PH = ((OH-1)*SH + WH - H)
+        PW = ((OW-1)*SW + WW - W)
+
+    Pht = int(PH/2)
+    Phb = PH-Pht
+    Pwl = int(PW/2)
+    Pwr = PW-Pwl
+    x_pad = np.zeros((N, H + Pht + Phb, W + Pwl + Pwr, C))
+    x_pad[:, Pht:H+Pht, Pwl:W+Pwl, :] = x
+    out = np.zeros((N, OH, OW, F))
+    for i in range(N):
+        for j in range(OH):
+            for k in range(OW):
+                for l in range(F):
+                    out[i, j, k, l] = np.sum(x_pad[i, SH*j:SH*j+WH, SW*k:SW*k+WW, :]*w[l, :, :, :]) + b[l]
     ##############################################################################
     #                             END OF YOUR CODE                               #
     ##############################################################################
@@ -46,7 +73,8 @@ def conv_backward(dout, cache):
     ##############################################################################
     #                          IMPLEMENT YOUR CODE                               #
     ##############################################################################
-    pass
+    x, w, b, conv_param = cache
+
     ##############################################################################
     #                             END OF YOUR CODE                               #
     ##############################################################################
@@ -72,7 +100,19 @@ def max_pool_forward(x, pool_param):
     ##############################################################################
     #                          IMPLEMENT YOUR CODE                               #
     ##############################################################################
-    pass
+    N,H,W,C = x.shape
+    pool_H = pool_param['pool_height']
+    pool_W = pool_param['pool_weight']
+    S = pool_param['stride']
+    SH = S[1]
+    SW = S[2]
+
+    #with padding = 'valid'
+    OH = (H-pool_H)/SH + 1
+    OW = (W-pool_W)/SW + 1
+
+    
+
     ##############################################################################
     #                             END OF YOUR CODE                               #
     ##############################################################################
