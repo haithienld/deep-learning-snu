@@ -1,6 +1,5 @@
 import numpy as np
 from Utils.data_utils import plot_conv_images
-import math 
 
 def conv_forward(x, w, b, conv_param):
     """
@@ -15,6 +14,7 @@ def conv_forward(x, w, b, conv_param):
       - 'padding': "valid" or "same". "valid" means no padding.
         "same" means zero-padding the input so that the output has the shape as (N, ceil(H / SH), ceil(W / SW), F)
         If the padding on both sides (top vs bottom, left vs right) are off by one, the bottom and right get the additional padding.
+         
     Outputs:
     - out: Output data
     - cache: (x, w, b, conv_param)
@@ -22,58 +22,7 @@ def conv_forward(x, w, b, conv_param):
     ##############################################################################
     #                          IMPLEMENT YOUR CODE                               #
     ##############################################################################
-    N,H,W,C =x.shape #batch-size (number of images - one times), Height, Width, Channel
-    # print("Height, Width, Channel of x:Image",H,W,C)
-    F,WH,WW,C = w.shape #Number of Filters, Filter Height, Filter Width, Channel
-    # print("Height, Width, Channel of w:filter", WH,WW,C)
-    S = conv_param['stride']
-    SH = S[1]
-    SW = S[2]
-    # print("Height, Width of stride", SH,SW)
-    if (conv_param['padding'] =='valid'):
-        Ph = Pw = 0
-        H_out = int((H-WH)/SH) +1
-        W_out = int((W-WW)/SW) +1
-        # x_pad = np.pad(x, ((0,), (Ph,), (Pw,), (0,)), mode='constant')
-    if (conv_param['padding'] =='same'):
-        # H_out = int((H-WH+2*Ph)/SH) +1
-        # W_out = int((W-WW+2*Pw)/SW) +1
-        H_out = math.ceil(H/SH)
-        W_out = math.ceil(W/SW)
-        Ph = int((H_out-1)*SH + WH - H)
-        Pw = int((W_out-1)*SW + WW - W)
-    #If padding == same ==> Calculate PH_Top, Ph_Bottom, Pw_Left, Pw_Right
-    Pht = int(Ph/2)
-    Phb = Ph - Pht
-    Pwl = int(Pw/2)
-    Pwr = Pw - Pwl
-    # x_pad = np.pad(x, ((0,), (Pht,Phb), (Pwr,Pwl), (0,)), mode='constant')
-    x_pad = np.zeros((N, H + Pht + Phb, W + Pwl + Pwr, C))
-    x_pad[:, Pht:H+Pht, Pwl:W+Pwl, :] = x
-        #print(x_pad)
-        # Shape N,F
-    out = np.zeros((N, H_out, W_out, F))
-    for i in range(N):
-        image = x_pad[ i, :, : , : ]
-        for j in range(H_out):
-            for k in range(W_out):
-                for l in range(F):
-                    h1 = j*SH
-                    h2 = j*SH + WH
-                    w1 = k*SW
-                    w2 = k*SW + WW
-                    image_temp = image[h1:h2, w1:w2,:]
-                    out[i,j,k,l] = np.sum(np.multiply(image_temp, w[l, :, :, :])) + b[l]
-    #a output data has size H_out, W_out
-    # H_out = int((H-WH+2*Ph)/SH) +1
-    # W_out = int((W-WW+2*Pw)/SW) +1
-
-    # for i in range(C):
-    #     for j in range (H + 2 * Ph):
-    #         for k in range (W + 2 * Pw):
-    #             a = 3
-
-    
+    pass
     ##############################################################################
     #                             END OF YOUR CODE                               #
     ##############################################################################
@@ -97,55 +46,13 @@ def conv_backward(dout, cache):
     ##############################################################################
     #                          IMPLEMENT YOUR CODE                               #
     ##############################################################################
-    (x, w, b, conv_param) = cache
-    N,H,W,C = x.shape
-    F,WH,WW,C = w.shape
-    S = conv_param['stride']
-    SH = S[1]
-    SW = S[2]
-    padding = conv_param['padding']
-    if padding == 'valid':
-        Ph = Pw = 0
-        H_out = int((H - WH + 2*Ph)/SH + 1)
-        W_out = int((W - WW + 2*Pw)/SW + 1)
-    if padding == 'same':
-        H_out = math.ceil(H/SH)
-        W_out = math.ceil(W/SW)
-        print("Height output, Width output of Padding = Same", H_out,W_out)
-        Ph = int((H_out-1)*SH + WH - H)
-        Pw = int((W_out-1)*SW + WW - W)
-    #If padding == same ==> Calculate PH_Top, Ph_Bottom, Pw_Left, Pw_Right
-    Pht = int(Ph/2)
-    Phb = Ph - Pht
-    Pwl = int(Pw/2)
-    Pwr = Pw - Pwl
-    x_pad = np.zeros((N,H + Pht + Phb, W + Pwl + Pwr,C))
-    x_pad[:,Pht:H + Pht, Pwl:W + Pwl,:] = x
-    dw = np.zeros(w.shape)
-    for i in range(N):
-        for j in range(H_out):
-            for k in range(W_out):
-                for l in range(F):
-                    dw[l,:,:,:] += x_pad[i,j*SH:j*SH + WH, k*SW:k*SW+WW,:]*dout[i,j,k,l]
-    db = np.zeros(b.shape)
-    for f in range(F):
-        db[f] += np.sum(dout[:,:,:,f])
-    dx = np.zeros(x.shape)
-    dx_pad = np.zeros(x_pad.shape)
-    for i in range(N):
-        for j in range(H_out):
-            for k in range(W_out):
-                for l in range(F):
-                    for c in range(C):
-                        dx_pad[i,j*SH:j*SH + WH, k*SW:k*SW+WW,c] += w[l,:,:,c]*dout[i,j,k,l]
-    dx = dx_pad[:,Pht: H+Pht, Pwl:W+Pwl, :]
+    pass
     ##############################################################################
     #                             END OF YOUR CODE                               #
     ##############################################################################
     return dx, dw, db
 
 def max_pool_forward(x, pool_param):
-    #https://datascience-enthusiast.com/DL/Convolution_model_Step_by_Stepv2.html
     """
     Computes the forward pass for a pooling layer.
     
@@ -165,29 +72,7 @@ def max_pool_forward(x, pool_param):
     ##############################################################################
     #                          IMPLEMENT YOUR CODE                               #
     ##############################################################################
-    N,H,W,C = x.shape
-    pool_H = pool_param['pool_height']
-    pool_W = pool_param['pool_width']
-    S = pool_param['stride']
-    SH = S[1]
-    SW = S[2]
-    #if padding == 'valid'
-    Ph = Pw = 0
-    H_out = int((H - pool_H + 2*Ph)/SH + 1)
-    W_out = int((W - pool_W + 2*Pw)/SW + 1)
-    x_pad = np.zeros((N,H,W,C))
-    x_pad[:,0:H,0:W,:] = x
-    out = np.zeros((N, H_out, W_out, C))
-    for i in range(N):
-        image = x_pad[ i, :, : , : ]
-        for j in range(H_out):
-            for k in range(W_out):
-                for l in range(C):
-                    h1 = j*SH
-                    h2 = j*SH + pool_H
-                    w1 = k*SW
-                    w2 = k*SW + pool_W
-                    out[i,j,k,l] = np.amax(x_pad[i,h1:h2,w1:w2,l])
+    pass
     ##############################################################################
     #                             END OF YOUR CODE                               #
     ##############################################################################
@@ -211,29 +96,7 @@ def max_pool_backward(dout, cache):
     ##############################################################################
     #                          IMPLEMENT YOUR CODE                               #
     ##############################################################################
-    (x,pool_param) = cache
-    N,H,W,C = x.shape
-    pool_height = pool_param['pool_height']
-    pool_width = pool_param['pool_width']
-    S = pool_param['stride']
-    SH, SW = S[1], S[2]
-    # padding == 'valid'
-    PH = 0
-    PW = 0
-    # output size
-    H_out = int((H - pool_height + 2*0)/SH + 1)
-    W_out = int((W - pool_width + 2*0)/SW + 1)
-    dx = np.zeros(x.shape)
-    #print(out.shape)
-    for i in range(N):
-        for j in range(H_out):
-            for k in range(W_out):
-                for l in range(C):
-                    temp = x[i, j*SH:j*SH+pool_height, k*SW:k*SW+pool_width, l]
-                    max_idx = np.unravel_index(np.argmax(temp, axis=None), temp.shape)
-                    temp = np.zeros(temp.shape)
-                    temp[max_idx] = 1
-                    dx[i, j*SH:j*SH+pool_height, k*SW:k*SW+pool_width, l] += temp * dout[i, j, k, l]
+    pass
     ##############################################################################
     #                             END OF YOUR CODE                               #
     ##############################################################################
@@ -258,7 +121,7 @@ def Test_conv_forward(num):
                                  [[ -2.29811741e-01,   5.68244402e-01],
                                   [ -2.82506405e-01,   6.88792470e-01]]],
                                 [[[ -5.10849950e-01,   1.21116743e+00],
-                                   [ -5.63544614e-01,   1.33171550e+00]],
+                                  [ -5.63544614e-01,   1.33171550e+00]],
                                  [[ -7.91888159e-01,   1.85409045e+00],
                                   [ -8.44582823e-01,   1.97463852e+00]]]])
     else:
