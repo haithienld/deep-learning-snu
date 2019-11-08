@@ -36,8 +36,8 @@ def rnn_step_forward(x, prev_h, Wx, Wh, b):
     # hidden state and any values you need for the backward pass in the next_h   #
     # and cache variables respectively.                                          #
     ##########################################################################
-
-
+    next_h = np.tanh(np.dot(x,Wx) + np.dot(prev_h,Wh) + b)
+    cache = (next_h, x, prev_h, Wx, Wh)
     ##########################################################################
     #                               END OF YOUR CODE                             #
     ##########################################################################
@@ -69,8 +69,18 @@ def rnn_step_backward(dnext_h, cache):
     # HINT: For the tanh function, you can compute the local derivative in terms #
     # of the output value from tanh.                                             #
     ##########################################################################
+    (next_h, x, prev_h, Wx, Wh) = cache
+    #https://stats.stackexchange.com/questions/193352/in-rnn-back-propagation-through-time-why-is-the-dh-t-dh-t-1-diagonal
+ 
 
+    dh = (1-next_h*next_h)*dnext_h
 
+    dWx = np.dot(x.T,dh)
+    dx = np.dot(dh,Wx.T)
+    dWh = np.dot(prev_h.T,dh)     
+    dprev_h = np.dot(dh,Wh.T)
+    
+    db = np.sum(dh, axis=0)
     ##########################################################################
     #                               END OF YOUR CODE                             #
     ##########################################################################
@@ -104,7 +114,17 @@ def rnn_forward(x, h0, Wx, Wh, b):
     # input data. You should use the rnn_step_forward function that you defined  #
     # above.                                                                     #
     ##########################################################################
-
+    N,T,D = x.shape
+    H = h0.shape[1]
+    cache = []
+    print(H)
+    h = np.zeros((N,T,H))
+    for t in range(T):
+      if t == 0:
+          h[:,t,:], cache_tmp = rnn_step_forward(x[:,t,:], h0, Wx, Wh, b)
+      else:
+          h[:,t,:], cache_tmp = rnn_step_forward(x[:,t,:], h[:,t-1,:], Wx, Wh, b)
+      cache.append(cache_tmp)
 
     ##########################################################################
     #                               END OF YOUR CODE                             #
