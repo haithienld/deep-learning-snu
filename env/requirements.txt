@@ -1,5 +1,7 @@
 sklearn
 opencv-python
+golang
+libjpeg-turbo
 go_vncdriver    
 universe
 atari_py
